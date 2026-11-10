@@ -13,15 +13,18 @@ def multiply(a, b):
     return a * b
 
 
-def divide(a, b):
-    if b == 0:
+def _validate_divisor(divisor):
+    if divisor == 0:
         raise ValueError("除数不能为零")
+
+
+def divide(a, b):
+    _validate_divisor(b)
     return a / b
 
 
 def percentage(part, whole):
-    if whole == 0:
-        raise ValueError("除数不能为零")
+    _validate_divisor(whole)
     return part / whole * 100
 
 
