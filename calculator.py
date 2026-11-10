@@ -23,3 +23,13 @@ def percentage(part, whole):
     if whole == 0:
         raise ValueError("除数不能为零")
     return part / whole * 100
+
+
+def clamp(value, minimum, maximum):
+    if minimum > maximum:
+        raise ValueError("minimum 不能大于 maximum")
+    if value < minimum:
+        return minimum
+    if value > maximum:
+        return maximum
+    return value
