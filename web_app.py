@@ -78,16 +78,27 @@ PAGE_HTML = """<!DOCTYPE html>
     outline: 3px solid rgba(37, 99, 235, 0.18);
     border-color: var(--brand);
   }
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
   button {
     border: 0;
     background: var(--brand);
     color: #fff;
     font-weight: 700;
     cursor: pointer;
-    margin-top: 4px;
+    margin-top: 0;
+    flex: 1 1 0;
   }
   button:hover { background: var(--brand-dark); }
   button:active { transform: translateY(1px); }
+  button.secondary {
+    background: #e2e8f0;
+    color: var(--text);
+  }
+  button.secondary:hover { background: #cbd5e1; }
   .result, .error {
     margin-top: 18px;
     padding: 14px;
@@ -126,10 +137,10 @@ PAGE_HTML = """<!DOCTYPE html>
   <div class="field">
     <label for="operation">选择运算</label>
     <select id="operation">
-      <option value="add">加（+）</option>
-      <option value="subtract">减（-）</option>
-      <option value="multiply">乘（×）</option>
-      <option value="divide">除（÷）</option>
+      <option value="add">加法（+）</option>
+      <option value="subtract">减法（-）</option>
+      <option value="multiply">乘法（×）</option>
+      <option value="divide">除法（÷）</option>
     </select>
   </div>
 
@@ -138,7 +149,10 @@ PAGE_HTML = """<!DOCTYPE html>
     <input id="second" type="number" step="any" inputmode="decimal" placeholder="例如 2.5 或 -3">
   </div>
 
-  <button id="calculate" type="button">计算</button>
+  <div class="actions">
+    <button id="calculate" type="button">计算</button>
+    <button id="clear" type="button" class="secondary">清空</button>
+  </div>
 
   <section class="result" aria-live="polite">
     <strong>结果</strong>
@@ -155,6 +169,7 @@ PAGE_HTML = """<!DOCTYPE html>
   var secondInput = document.getElementById("second");
   var operationSelect = document.getElementById("operation");
   var button = document.getElementById("calculate");
+  var clearButton = document.getElementById("clear");
   var resultOutput = document.getElementById("result");
   var errorBox = document.getElementById("error");
   var errorText = document.getElementById("error-text");
@@ -177,6 +192,15 @@ PAGE_HTML = """<!DOCTYPE html>
     var value = Number(input.value);
     return Number.isFinite(value) ? value : null;
   }
+
+  clearButton.addEventListener("click", function () {
+    firstInput.value = "";
+    secondInput.value = "";
+    operationSelect.value = "add";
+    resultOutput.textContent = "等待计算";
+    clearError();
+    firstInput.focus();
+  });
 
   button.addEventListener("click", function () {
     clearError();

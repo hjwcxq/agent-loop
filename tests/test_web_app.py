@@ -68,6 +68,48 @@ class WebAppHTTPTests(unittest.TestCase):
         self.assertNotIn("http://", html)
         self.assertNotIn("https://", html)
 
+    def test_page_has_clear_button_next_to_calculate(self):
+        status, content_type, content = self.request("GET", "/")
+        self.assertEqual(status, 200)
+        self.assertIn("text/html", content_type)
+        html = content.decode("utf-8")
+        self.assertIn("清空", html)
+        self.assertIn('id="clear"', html)
+        actions_index = html.index('class="actions"')
+        calculate_index = html.index('id="calculate"')
+        clear_index = html.index('id="clear"')
+        self.assertLess(actions_index, calculate_index)
+        self.assertLess(calculate_index, clear_index)
+
+    def test_page_clear_button_resets_state(self):
+        status, _, content = self.request("GET", "/")
+        self.assertEqual(status, 200)
+        html = content.decode("utf-8")
+        self.assertIn("加法", html)
+        reset_script = html[
+            html.index("clearButton.addEventListener") : html.index(
+                "button.addEventListener"
+            )
+        ]
+        self.assertIn('firstInput.value = ""', reset_script)
+        self.assertIn('secondInput.value = ""', reset_script)
+        self.assertIn('operationSelect.value = "add"', reset_script)
+        self.assertIn('resultOutput.textContent = "等待计算"', reset_script)
+        self.assertIn("clearError();", reset_script)
+
+    def test_clear_then_recalculate_returns_five(self):
+        status, _, content = self.request("GET", "/")
+        self.assertEqual(status, 200)
+        html = content.decode("utf-8")
+        self.assertIn("清空", html)
+        self.assertIn("等待计算", html)
+
+        status, data = self.post_calculate(
+            {"operation": "add", "a": 2, "b": 3}
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(data, {"result": 5})
+
     def test_health(self):
         status, content_type, content = self.request("GET", "/health")
         self.assertEqual(status, 200)
